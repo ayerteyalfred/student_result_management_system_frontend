@@ -19,9 +19,9 @@ const service = axios.create({
 service.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('Token')
-    let authToken = token ? crypto.decryptData(token, crypto.secretKey()) : ''
+    let authToken = token ? `Token ${crypto.decryptData(token, crypto.secretKey())}` : ''
 
-    config.headers['Authorization'] = `Bearer ${authToken}`
+    config.headers['Authorization'] = authToken
     return config
   },
   (error) => {

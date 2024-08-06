@@ -42,7 +42,9 @@ import Password from 'primevue/password'
 import Toast from 'primevue/toast'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router';
 import helper from '@/services/helper.js'
+const router = useRouter()
 
 const email = ref('')
 const password = ref('')
@@ -62,7 +64,16 @@ const signIn = () => {
   loginUserAction(data)
     .then((res) => {
       loading.value = false
-      helper.showSuccess(res.message, toast)
+      if (res.user.user_type == "teacher") {
+        helper.showSuccess(res.message, toast)
+        router.push({ name: 'index-teacher' })
+      }
+      else if (res.user.user_type == "student") {
+        helper.showSuccess(res.message, toast)
+        router.push({ name: 'student-details' })
+      }
+      console.log(res);
+
     })
     .catch((err) => {
       loading.value = false

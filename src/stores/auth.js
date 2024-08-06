@@ -30,15 +30,18 @@ export const useAuthStore = defineStore('auth', {
         new resource('auth/login/')
           .store(data)
           .then((res) => {
-            const encryptedUser = crypto.encryptData(JSON.stringify(res.user), crypto.secretKey())
+            const encryptedUser = crypto.encryptData(
+              JSON.stringify(res.data.user),
+              crypto.secretKey()
+            )
             localStorage.setItem('userInfo', encryptedUser)
             this.user = res.data.user
 
-            const encryptedToken = crypto.encryptData(res.token, crypto.secretKey())
+            const encryptedToken = crypto.encryptData(res.data.token, crypto.secretKey())
             localStorage.setItem('Token', encryptedToken)
             this.token = encryptedToken
 
-            resolve(res.data.user)
+            resolve(res.data)
           })
           .catch((error) => {
             reject(error)
@@ -48,18 +51,14 @@ export const useAuthStore = defineStore('auth', {
 
     signoutAction() {
       return new Promise((resolve, reject) => {
-        new resource('logout')
-          .list({})
+        new resource('auth/logout/')
+          .store()
           .then((res) => {
             this.user = {}
             this.token = ''
-            this.permissions = []
 
             localStorage.removeItem('userInfo')
             localStorage.removeItem('Token')
-            localStorage.removeItem('Permissions')
-            clearTimeout(this.sessionTimer)
-            this.sessionTimer = null
 
             resolve(res)
           })
@@ -67,41 +66,41 @@ export const useAuthStore = defineStore('auth', {
             reject(error)
           })
       })
-    },
-
-    refreshToken() {
-      return new Promise((resolve, reject) => {
-        new resource('refresh')
-          .list()
-          .then((res) => {
-            // Update the token with the refreshed token
-            const encryptedToken = crypto.encryptData(res.data.access_token, crypto.secretKey())
-            localStorage.setItem('Token', encryptedToken)
-            this.token = encryptedToken
-            // Restart session timer
-            // console.log("Restarted");
-            this.startSessionTimer()
-            resolve()
-          })
-          .catch((error) => {
-            helper
-              .sessionExpiredPrompt('Session Expired', {
-                allowOutsideClick: false // Disable closing on outside click
-              })
-              .then((result) => {
-                if (result.isConfirmed) {
-                  localStorage.removeItem('userInfo')
-                  localStorage.removeItem('Token')
-                  localStorage.removeItem('Permissions')
-                  this.router.push({ name: 'login' }).then(() => {
-                    this.router.go()
-                  })
-                }
-              })
-            console.error('Failed to refresh token:', error)
-            reject()
-          })
-      })
     }
+
+    // refreshToken() {
+    //   return new Promise((resolve, reject) => {
+    //     new resource('refresh')
+    //       .list()
+    //       .then((res) => {
+    //         // Update the token with the refreshed token
+    //         const encryptedToken = crypto.encryptData(res.data.access_token, crypto.secretKey())
+    //         localStorage.setItem('Token', encryptedToken)
+    //         this.token = encryptedToken
+    //         // Restart session timer
+    //         // console.log("Restarted");
+    //         this.startSessionTimer()
+    //         resolve()
+    //       })
+    //       .catch((error) => {
+    //         helper
+    //           .sessionExpiredPrompt('Session Expired', {
+    //             allowOutsideClick: false // Disable closing on outside click
+    //           })
+    //           .then((result) => {
+    //             if (result.isConfirmed) {
+    //               localStorage.removeItem('userInfo')
+    //               localStorage.removeItem('Token')
+    //               localStorage.removeItem('Permissions')
+    //               this.router.push({ name: 'login' }).then(() => {
+    //                 this.router.go()
+    //               })
+    //             }
+    //           })
+    //         console.error('Failed to refresh token:', error)
+    //         reject()
+    //       })
+    //   })
+    // }
   }
 })
