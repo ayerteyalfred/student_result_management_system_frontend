@@ -23,6 +23,12 @@ class Resource {
       method: 'get'
     })
   }
+  newget() {
+    return request({
+      url: '/' + this.uri + '/',
+      method: 'get'
+    })
+  }
   store(resource) {
     return request({
       url: '/' + this.uri,

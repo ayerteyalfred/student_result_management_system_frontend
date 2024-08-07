@@ -26,6 +26,13 @@ const MyPreset = definePreset(Aura, {
       800: '{blue.800}',
       900: '{blue.900}',
       950: '{blue.950}'
+    },
+    colorScheme: {
+      light: {
+        primary: {
+          inputtextDisabledBackground: '{blue.100}'
+        }
+      }
     }
   }
 })
