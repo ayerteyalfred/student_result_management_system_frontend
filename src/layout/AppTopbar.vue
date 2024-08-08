@@ -25,6 +25,9 @@ const { onMenuToggle } = useLayout();
 const encryptedUser = ref(localStorage.getItem('userInfo'));
 const user = encryptedUser.value ? JSON.parse(crypto.decryptData(encryptedUser.value, crypto.secretKey())) : {}
 
+// console.log(user);
+
+
 const handleSignout = () => {
     helper.requireConfirmation(toast, confirm, signoutAction, router)
 }

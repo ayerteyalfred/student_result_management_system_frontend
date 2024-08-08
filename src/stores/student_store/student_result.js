@@ -2,28 +2,28 @@ import { defineStore } from 'pinia'
 import resource from '@/services/resources'
 import { useAuthStore } from '../auth'
 
-export const useStudentDetailsStore = defineStore('student_details', {
+export const useStudentResultStore = defineStore('student_result', {
   state: () => ({
-    student_details: {}
+    student_result: {}
   }),
 
   getters: {
-    getStudentDetails(state) {
-      return state.student_details
+    getStudentResult(state) {
+      return state.student_result
     }
   },
 
   actions: {
-    fetchStudentDetailsAction() {
+    fetchStudentResultAction(params) {
       const { getStudentId } = useAuthStore()
       const student_id = getStudentId
 
       return new Promise((resolve, reject) => {
-        new resource(`students/${student_id}/details`)
+        new resource(`students/${student_id}/results/${params}`)
           .newget()
           .then((res) => {
-            this.student_details = res.data.data.student
-            // console.log(res.data.data.student)
+            this.student_result = res.data
+            console.log(res.data)
 
             resolve(res)
           })
