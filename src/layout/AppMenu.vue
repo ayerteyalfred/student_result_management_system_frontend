@@ -10,14 +10,12 @@ const user = encryptedUser.value ? JSON.parse(crypto.decryptData(encryptedUser.v
 const model = ref([
     {
         label: 'Home',
-        items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/overview-teacher' }]
-    },
-    {
-        label: 'Functionalities',
         items: [
+            { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/overview-teacher' },
             { label: 'Class', icon: 'pi pi-fw pi-id-card', to: '/teacher-class' },
             { label: 'Results', icon: 'pi pi-book', to: '/student-result' },
-            { label: 'Attendance', icon: 'pi pi-fw pi-check-square', to: '/attendance' },
+            // { label: 'Attendance', icon: 'pi pi-fw pi-check-square', to: '/attendance' },
+            { label: 'Personal Details', icon: 'pi pi-fw pi-home', to: '/teacher-details' },
             { label: 'Subjects', icon: 'pi pi-calculator', to: '/subjects' },
             { label: 'Issues', icon: 'pi pi-question', to: '/issues' },
         ]
@@ -28,8 +26,8 @@ const student_model = ref([
     {
         label: 'Home',
         items: [
+            { label: 'Student Results', icon: 'pi pi-fw pi-home', to: '/my-result' },
             { label: 'Personal Details', icon: 'pi pi-fw pi-home', to: '/student-details' },
-            { label: 'Student Results', icon: 'pi pi-fw pi-home', to: '/my-result' }
         ]
     }
 ]);

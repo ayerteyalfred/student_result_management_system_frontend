@@ -61,17 +61,17 @@
                 <div class="flex flex-col md:flex-row gap-4 w-full">
                     <InputGroup>
                         <InputGroupAddon>Surname</InputGroupAddon>
-                        <InputText :value="getStudentDetails?.surname" disabled />
+                        <InputText :value="getTeacherDetails?.surname" disabled />
                     </InputGroup>
 
                     <InputGroup>
                         <InputGroupAddon>Middle Name</InputGroupAddon>
-                        <InputText :value="getStudentDetails?.middle_name" disabled />
+                        <InputText :value="getTeacherDetails?.middle_name" disabled />
                     </InputGroup>
 
                     <InputGroup>
                         <InputGroupAddon>Given Name</InputGroupAddon>
-                        <InputText :value="getStudentDetails?.given_name" disabled />
+                        <InputText :value="getTeacherDetails?.given_name" disabled />
                     </InputGroup>
                 </div>
             </div>
@@ -79,35 +79,31 @@
                 <div class="flex flex-col md:flex-row gap-4 w-full">
                     <InputGroup>
                         <InputGroupAddon>Date Of Birth</InputGroupAddon>
-                        <InputText :value="getStudentDetails?.date_of_birth" disabled />
+                        <InputText :value="getTeacherDetails?.date_of_birth" disabled />
                     </InputGroup>
 
                     <InputGroup>
                         <InputGroupAddon>Gender</InputGroupAddon>
-                        <InputText :value="getStudentDetails?.gender" disabled />
+                        <InputText :value="getTeacherDetails?.gender" disabled />
                     </InputGroup>
 
                     <InputGroup>
-                        <InputGroupAddon>Enrolment Date</InputGroupAddon>
-                        <InputText :value="getStudentDetails?.enrolment_date" disabled />
+                        <InputGroupAddon>Username</InputGroupAddon>
+                        <InputText :value="getTeacherDetails?.user?.username" disabled />
                     </InputGroup>
                 </div>
             </div>
             <div class="card flex lg:flex-row flex-col gap-8">
                 <div class="flex flex-col md:flex-row gap-4 w-full">
-                    <InputGroup>
-                        <InputGroupAddon>Username</InputGroupAddon>
-                        <InputText :value="getStudentDetails?.user?.username" disabled />
-                    </InputGroup>
 
                     <InputGroup>
                         <InputGroupAddon>Email</InputGroupAddon>
-                        <InputText :value="getStudentDetails?.user?.email" disabled />
+                        <InputText :value="getTeacherDetails?.user?.email" disabled />
                     </InputGroup>
 
                     <InputGroup>
                         <InputGroupAddon>Grade</InputGroupAddon>
-                        <InputText :value="getStudentDetails?.grade" disabled />
+                        <InputText :value="getTeacherDetails?.grade" disabled />
                     </InputGroup>
                 </div>
             </div>
@@ -124,7 +120,7 @@
 <script setup>
 import { onBeforeMount, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useStudentDetailsStore } from '@/stores/student_store/student_details';
+import { useTeacherDetailsStore } from '@/stores/teacher_store/teacher_details';
 import ProgressSpinner from 'primevue/progressspinner'
 import DatePicker from 'primevue/datepicker';
 import InputText from 'primevue/inputtext';
@@ -136,8 +132,8 @@ import helper from '@/services/helper';
 import { useToast } from 'primevue/usetoast'
 
 
-const { getStudentDetails } = storeToRefs(useStudentDetailsStore())
-const { fetchStudentDetailsAction, updateStudent } = useStudentDetailsStore()
+const { getTeacherDetails } = storeToRefs(useTeacherDetailsStore())
+const { fetchTeacherDetailsAction, updateTeacher } = useTeacherDetailsStore()
 
 const toast = useToast()
 const loading = ref(false)
@@ -154,15 +150,15 @@ const user_type = "student"
 // Fetch data before page mounts
 onBeforeMount(async () => {
     loading.value = true
-    await fetchStudentDetailsAction()
+    await fetchTeacherDetailsAction()
         .then(() => {
             // Set the form fields after fetching data
-            if (getStudentDetails.value) {
-                surname.value = getStudentDetails.value.surname || ''
-                given_name.value = getStudentDetails.value.given_name || ''
-                middle_name.value = getStudentDetails.value.middle_name || ''
-                date_of_birth.value = getStudentDetails.value.date_of_birth || ''
-                gender.value = getStudentDetails.value.gender || ''
+            if (getTeacherDetails.value) {
+                surname.value = getTeacherDetails.value.surname || ''
+                given_name.value = getTeacherDetails.value.given_name || ''
+                middle_name.value = getTeacherDetails.value.middle_name || ''
+                date_of_birth.value = getTeacherDetails.value.date_of_birth || ''
+                gender.value = getTeacherDetails.value.gender || ''
             }
             loading.value = false
         })
@@ -195,11 +191,11 @@ const handleStudentupdate = () => {
         middle_name: middle_name.value,
         date_of_birth: formattedDateOfBirth,
         gender: gender.value,
-        enrolment_date: getStudentDetails.value?.enrolment_date,
-        grade: getStudentDetails.value?.grade
+        enrolment_date: getTeacherDetails.value?.enrolment_date,
+        grade: getTeacherDetails.value?.grade
     }
 
-    updateStudent(update_data)
+    updateTeacher(update_data)
         .then(() => {
             // console.log(res);
             helper.showSuccess('Update Successful', toast)

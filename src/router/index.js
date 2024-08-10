@@ -1,5 +1,6 @@
 import TeachesLayout from '@/layout/TeachesLayout.vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import { ref } from 'vue'
 import LogIn from '@/views/auth/LoginPage.vue'
 
 // Teacher Dashboard Pages
@@ -9,6 +10,7 @@ import StudentResult from '@/views/dashboard_teacher/StudentResult.vue'
 import StudentAttendance from '@/views/dashboard_teacher/StudentAttendance.vue'
 import SubjectsPage from '@/views/dashboard_teacher/SubjectsPage.vue'
 import IssuesPage from '@/views/dashboard_teacher/IssuesPage.vue'
+import TeacherDetails from '@/views/dashboard_teacher/TeacherDetails.vue'
 
 // Student Dashboard Page
 import StudentDetails from '@/views/dashboard_student/StudentDetails.vue'
@@ -19,11 +21,11 @@ import crypto from '@/services/crypto'
 const encryptedUser = localStorage.getItem('userInfo')
 const user = encryptedUser ? JSON.parse(crypto.decryptData(encryptedUser, crypto.secretKey())) : {}
 
-let default_redirect = ''
-if (user.user_type == 'teacher') {
-  default_redirect = 'overview-teacher'
-} else {
-  default_redirect = 'student-details'
+const default_redirect = ref()
+if (user?.user_type == 'teacher') {
+  default_redirect.value = 'overview-teacher'
+} else if (user?.user_type == 'student') {
+  default_redirect.value = 'student-details'
 }
 
 const router = createRouter({
@@ -43,7 +45,7 @@ const router = createRouter({
       path: '/',
       name: 'index-teacher',
       component: TeachesLayout,
-      redirect: default_redirect,
+      redirect: default_redirect.value,
       children: [
         {
           path: '/overview-teacher',
@@ -73,6 +75,14 @@ const router = createRouter({
           path: '/attendance',
           name: 'attendance',
           component: StudentAttendance,
+          meta: {
+            requiresAuth: true
+          }
+        },
+        {
+          path: '/teacher-details',
+          name: 'teacher-details',
+          component: TeacherDetails,
           meta: {
             requiresAuth: true
           }

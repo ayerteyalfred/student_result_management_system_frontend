@@ -31,6 +31,23 @@ export const useStudentDetailsStore = defineStore('student_details', {
             reject(error)
           })
       })
+    },
+
+    updateStudent(student) {
+      const { getStudentId } = useAuthStore()
+      const student_id = getStudentId
+      return new Promise((resolve, reject) => {
+        new resource('students')
+          .update(student, student_id)
+          .then((res) => {
+            // console.log(res.data.data)
+            this.student_details = res.data.data
+            resolve(res.data)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
     }
   }
 })

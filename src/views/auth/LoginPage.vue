@@ -54,36 +54,37 @@ const toast = useToast()
 const { loginUserAction } = useAuthStore()
 
 const signIn = () => {
-  loading.value = true
+  loading.value = true;
 
   const data = {
     email: email.value.trim().toLowerCase(),
-    password: password.value
-  }
+    password: password.value,
+  };
 
   loginUserAction(data)
     .then((res) => {
-      loading.value = false
-      if (res.user.user_type == "teacher") {
-        helper.showSuccess(res.message, toast)
-        router.push({ name: 'index-teacher' })
-      }
-      else if (res.user.user_type == "student") {
-        helper.showSuccess(res.message, toast)
-        router.push({ name: 'student-details' })
-      }
-      console.log(res);
+      loading.value = false;
+      helper.showSuccess(res.message, toast);
 
+      // Delay the redirection by 3 seconds (3000 milliseconds)
+      setTimeout(() => {
+        if (res.user?.user_type == "teacher") {
+          router.push({ name: "overview-teacher" });
+        } else if (res.user?.user_type == "student") {
+          router.push({ name: "my-result" });
+        }
+      }, 1000); // 2 seconds delay
     })
     .catch((err) => {
-      loading.value = false
-      helper.showError(err.response.data.message, toast)
-      email.value = ''
-      password.value = ''
-      invalid.value = true
-      console.log(err)
-    })
-}
+      loading.value = false;
+      helper.showError(err.response.data.message, toast);
+      email.value = "";
+      password.value = "";
+      invalid.value = true;
+      console.log(err);
+    });
+};
+
 </script>
 
 <style scoped></style>

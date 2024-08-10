@@ -1,25 +1,25 @@
 import { defineStore } from 'pinia'
 import resource from '@/services/resources'
 
-export const useSchoolYearStore = defineStore('school_year', {
+export const useOverViewStore = defineStore('overview', {
   state: () => ({
-    school_year: {}
+    overview: {}
   }),
 
   getters: {
-    getSchoolYears(state) {
-      return state.school_year
+    getOverview(state) {
+      return state.overview
     }
   },
 
   actions: {
-    fetchSchoolYearsAction() {
+    fetchOverViewAction() {
       return new Promise((resolve, reject) => {
-        new resource(`school-years`)
+        new resource(`teacher/overview`)
           .newget()
           .then((res) => {
-            this.school_year = res.data.data
-            // console.log(res.data)
+            this.overview = res.data
+            console.log(res.data)
 
             resolve(res)
           })

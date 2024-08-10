@@ -38,8 +38,8 @@ class Resource {
   }
   update(resource, id, updateWithFile = false) {
     return request({
-      url: '/' + this.uri + '/' + id,
-      method: updateWithFile ? 'post' : 'put',
+      url: '/' + this.uri + '/' + id + '/',
+      method: updateWithFile ? 'post' : 'patch',
       data: resource
     })
   }

@@ -39,6 +39,12 @@
                 class="fill-surface-0 dark:fill-surface-800" aria-label="loading" />
         </div>
 
+        <div class="card">
+            <DataTable :value="resultTableValues" tableStyle="min-width: 50rem" size="large">
+                <Column v-for="col of tableColumns" :key="col.field" :field="col.field" :header="col.header"></Column>
+            </DataTable>
+        </div>
+
     </div>
 </template>
 
@@ -53,17 +59,34 @@ import InputGroupAddon from 'primevue/inputgroupaddon';
 import ProgressSpinner from 'primevue/progressspinner'
 import Button from 'primevue/button';
 import Select from 'primevue/select';
+import helper from '@/services/helper';
+import { useToast } from 'primevue/usetoast'
 import { storeToRefs } from 'pinia';
 
+
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+
+const toast = useToast()
 const { getUser } = storeToRefs(useAuthStore())
 const { getSchoolYears } = storeToRefs(useSchoolYearStore())
 const { fetchSchoolYearsAction } = useSchoolYearStore()
 const { fetchStudentResultAction } = useStudentResultStore()
+const { getStudentResult } = storeToRefs(useStudentResultStore())
 
 const loading = ref(false)
 const username = ref(`${getUser.value.first_name} ${getUser.value.last_name}`)
 const termValue = ref();
 const yearValue = ref()
+const academic_year = ref([])
+const resultTableValues = ref()
+
+const tableColumns = [
+    { field: 'subject', header: 'Subject' },
+    { field: 'marks', header: 'Marks' },
+    { field: 'grade', header: 'Grade' },
+    { field: 'remark', header: 'Remark' }
+];
 
 const terms = ref([
     { name: 'First Term', code: 1 },
@@ -71,7 +94,6 @@ const terms = ref([
     { name: 'Third Term', code: 3 },
 ]);
 
-const academic_year = ref([])
 
 onBeforeMount(async () => {
     await fetchSchoolYearsAction()
@@ -87,18 +109,27 @@ onBeforeMount(async () => {
 })
 
 const handleGetResults = async () => {
-    console.log(yearValue.value, termValue.value);
+    // console.log(yearValue.value, termValue.value);
+    if (yearValue.value == undefined || termValue.value == undefined) {
+        return helper.showError('Select both academic year and term to proceed', toast)
+    }
     loading.value = true
     await fetchStudentResultAction(`${yearValue.value?.code}/${termValue.value?.code}`)
         .then(() => {
             loading.value = false
+            resultTableValues.value = getStudentResult.value.map((value) => ({
+                subject: value.subject.subject_name,
+                marks: value.marks,
+                grade: value.score,
+                remark: value.remarks
+            }))
         })
         .catch(error => {
+            resultTableValues.value = []
             console.log("Error fetching", error);
             loading.value = false
-
+            helper.showError('Results Not Found', toast)
         })
-
 }
 
 

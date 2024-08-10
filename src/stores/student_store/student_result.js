@@ -22,8 +22,8 @@ export const useStudentResultStore = defineStore('student_result', {
         new resource(`students/${student_id}/results/${params}`)
           .newget()
           .then((res) => {
-            this.student_result = res.data
-            console.log(res.data)
+            this.student_result = res.data.data
+            console.log(res.data.data)
 
             resolve(res)
           })
