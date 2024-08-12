@@ -41,7 +41,7 @@
         </Dialog>
 
         <div class="card flex flex-col justify-center items-center">
-            <h2>Student Personal Details</h2>
+            <h2>Teacher Personal Details</h2>
             <img src="/img/student_icon.png" class="lg:w-[5%] w-[10%] rounded-full bg-slate-500" alt="">
         </div>
 

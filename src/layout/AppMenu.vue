@@ -13,7 +13,7 @@ const model = ref([
         items: [
             { label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/overview-teacher' },
             { label: 'Class', icon: 'pi pi-fw pi-id-card', to: '/teacher-class' },
-            { label: 'Results', icon: 'pi pi-book', to: '/student-result' },
+            { label: 'Input Results', icon: 'pi pi-book', to: '/student-result' },
             // { label: 'Attendance', icon: 'pi pi-fw pi-check-square', to: '/attendance' },
             { label: 'Personal Details', icon: 'pi pi-fw pi-home', to: '/teacher-details' },
             { label: 'Subjects', icon: 'pi pi-calculator', to: '/subjects' },

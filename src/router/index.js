@@ -6,7 +6,7 @@ import LogIn from '@/views/auth/LoginPage.vue'
 // Teacher Dashboard Pages
 import OverviewPage from '@/views/dashboard_teacher/OverviewPage.vue'
 import TeacherClass from '@/views/dashboard_teacher/TeacherClass.vue'
-import StudentResult from '@/views/dashboard_teacher/StudentResult.vue'
+import ResultInput from '@/views/dashboard_teacher/ResultInput.vue'
 import StudentAttendance from '@/views/dashboard_teacher/StudentAttendance.vue'
 import SubjectsPage from '@/views/dashboard_teacher/SubjectsPage.vue'
 import IssuesPage from '@/views/dashboard_teacher/IssuesPage.vue'
@@ -26,6 +26,8 @@ if (user?.user_type == 'teacher') {
   default_redirect.value = 'overview-teacher'
 } else if (user?.user_type == 'student') {
   default_redirect.value = 'student-details'
+} else {
+  default_redirect.value = 'login'
 }
 
 const router = createRouter({
@@ -66,7 +68,7 @@ const router = createRouter({
         {
           path: '/student-result',
           name: 'student-result',
-          component: StudentResult,
+          component: ResultInput,
           meta: {
             requiresAuth: true
           }

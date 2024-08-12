@@ -1,12 +1,30 @@
 <template>
     <div class="flex flex-col gap-8">
 
-        <div class="flex lg:flex-row flex-col justify-between">
-            <div class="col-span-12 lg:col-span-6 xl:col-span-3 w-[40%]">
+        <div class="grid grid-cols-12 gap-8">
+            <div class="col-span-12 lg:col-span-6 xl:col-span-3"
+                style="padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
                 <div class="card mb-0">
                     <div class="flex justify-between mb-4">
                         <div>
-                            <span class="block text-muted-color font-medium mb-4">Total number of student enrolled in
+                            <span class="block text-muted-color font-medium mb-4">Active Academic Year</span>
+                            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">
+                                {{ getOverview.active_academic_year }}
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border"
+                            style="width: 2.5rem; height: 2.5rem">
+                            <img src="/img/academic_year.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6 xl:col-span-3"
+                style="padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+                <div class="card mb-0">
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <span class="block text-muted-color font-medium mb-4">Student enrolled in
                                 this class</span>
                             <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">
                                 {{ getOverview.total_students_in_class }}
@@ -14,7 +32,41 @@
                         </div>
                         <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border"
                             style="width: 2.5rem; height: 2.5rem">
-                            <img src="/img/student_icon.png" alt="">
+                            <img src="/img/student_class.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6 xl:col-span-3"
+                style="padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+                <div class="card mb-0">
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <span class="block text-muted-color font-medium mb-4">Total Student in the School</span>
+                            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">
+                                {{ getOverview.total_students_in_school }}
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border"
+                            style="width: 2.5rem; height: 2.5rem">
+                            <img src="/img/student_school.png" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-12 lg:col-span-6 xl:col-span-3"
+                style="padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+                <div class="card mb-0">
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <span class="block text-muted-color font-medium mb-4">Total Teachers in the School</span>
+                            <div class="text-surface-900 dark:text-surface-0 font-medium text-xl">
+                                {{ getOverview.total_teachers }}
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center bg-blue-100 dark:bg-blue-400/10 rounded-border"
+                            style="width: 2.5rem; height: 2.5rem">
+                            <img src="/img/teacher_icon.png" alt="">
                         </div>
                     </div>
                 </div>

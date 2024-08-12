@@ -11,7 +11,7 @@
                 <InputGroupAddon>
                     <i class="pi pi-user"></i>
                 </InputGroupAddon>
-                <InputText placeholder="Website" :value="username" disabled />
+                <InputText placeholder="" :value="username" disabled />
             </InputGroup>
 
             <InputGroup>
