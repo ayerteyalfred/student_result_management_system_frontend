@@ -7,9 +7,6 @@ import LogIn from '@/views/auth/LoginPage.vue'
 import OverviewPage from '@/views/dashboard_teacher/OverviewPage.vue'
 import TeacherClass from '@/views/dashboard_teacher/TeacherClass.vue'
 import ResultInput from '@/views/dashboard_teacher/ResultInput.vue'
-import StudentAttendance from '@/views/dashboard_teacher/StudentAttendance.vue'
-import SubjectsPage from '@/views/dashboard_teacher/SubjectsPage.vue'
-import IssuesPage from '@/views/dashboard_teacher/IssuesPage.vue'
 import TeacherDetails from '@/views/dashboard_teacher/TeacherDetails.vue'
 
 // Student Dashboard Page
@@ -74,14 +71,6 @@ const router = createRouter({
           }
         },
         {
-          path: '/attendance',
-          name: 'attendance',
-          component: StudentAttendance,
-          meta: {
-            requiresAuth: true
-          }
-        },
-        {
           path: '/teacher-details',
           name: 'teacher-details',
           component: TeacherDetails,
@@ -89,22 +78,7 @@ const router = createRouter({
             requiresAuth: true
           }
         },
-        {
-          path: '/subjects',
-          name: 'subjects',
-          component: SubjectsPage,
-          meta: {
-            requiresAuth: true
-          }
-        },
-        {
-          path: '/issues',
-          name: 'issues',
-          component: IssuesPage,
-          meta: {
-            requiresAuth: true
-          }
-        },
+
         // Student Dashboard Link
         {
           path: '/student-details',

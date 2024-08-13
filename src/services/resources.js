@@ -45,7 +45,7 @@ class Resource {
   }
   destroy(id) {
     return request({
-      url: '/' + this.uri + '/' + id,
+      url: '/' + this.uri + '/' + id + '/',
       method: 'delete'
     })
   }

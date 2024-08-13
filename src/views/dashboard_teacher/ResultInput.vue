@@ -1,25 +1,39 @@
 <template>
+    <Dialog v-model:visible="confirmDeleteVisible" modal header="Confirm Deletion" :style="{ width: '30rem' }">
+        <div class="confirmation-content">
+            <span class="pi pi-exclamation-triangle" style="font-size: 2rem;"></span>
+            <span>Are you sure you want to delete this result?</span>
+        </div>
+        <template #footer>
+            <Button label="No" icon="pi pi-times" @click="confirmDeleteVisible = false" class="p-button-text" />
+            <Button label="Yes" icon="pi pi-check" @click="handleDeleteResult" class="p-button-danger" />
+        </template>
+    </Dialog>
+
     <Dialog v-model:visible="input_result_visible" modal header="Input Results" :style="{ width: '44rem' }">
-        <form class="flex flex-col gap-4">
+        <form @submit.prevent="handleCreateResult" class="flex flex-col gap-4">
             <div class="flex flex-col md:flex-row gap-4 w-full">
                 <InputGroup>
                     <InputGroupAddon>Student</InputGroupAddon>
-                    <Select optionLabel="name" placeholder="Select Student" required class="w-full md:w-56" />
+                    <Select :options="student_list" optionLabel="student_name" placeholder="Select Student" required
+                        class="w-full md:w-56" />
                 </InputGroup>
 
                 <InputGroup>
                     <InputGroupAddon>Exam</InputGroupAddon>
-                    <Select optionLabel="name" placeholder="Select Exam" required class="w-full md:w-56" />
+                    <Select :options="getExams" optionLabel="name" placeholder="Select Exam" required
+                        class="w-full md:w-56" />
                 </InputGroup>
             </div>
             <div class="flex flex-col md:flex-row gap-4 w-full">
                 <InputGroup>
                     <InputGroupAddon>Subject</InputGroupAddon>
-                    <Select optionLabel="name" placeholder="Select Subject" required class="w-full md:w-56" />
+                    <Select :options="getSubjects" optionLabel="subject_name" placeholder="Select Subject" required
+                        class="w-full md:w-56" />
                 </InputGroup>
                 <InputGroup>
                     <InputGroupAddon>Mark</InputGroupAddon>
-                    <InputNumber inputId="minmax" prefix="%" min="0" max="100" fluid />
+                    <InputNumber inputId="minmax" prefix="%" :min="0" :max="100" fluid />
                 </InputGroup>
             </div>
             <div class="flex justify-end items-end">
@@ -76,17 +90,20 @@
                 tableStyle="min-width: 50rem" size="large" @row-edit-save="onRowEditSave">
                 <Column v-for="col of tableColumns" :key="col.field" :field="col.field" :header="col.header">
                     <template #editor="{ data, field }">
-                        <InputNumber v-if="field === 'marks'" v-model="data[field]" suffix="%" min="0" max="100" />
-                        <InputText v-else v-model="data[field]" />
+                        <InputNumber v-if="field == 'marks'" v-model="data[field]" suffix="%" :min="0" :max="100" />
+                        <InputText v-else v-model="data[field]" disabled />
                     </template>
                 </Column>
                 <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
+                <Column :exportable="false" style="width: 10%; min-width: 12rem">
+                    <template #body="slotProps">
+                        <Button icon="pi pi-trash" outlined rounded severity="danger"
+                            @click="confirmDeleteResult(slotProps.data.id)" />
+                    </template>
+                </Column>
             </DataTable>
         </div>
     </div>
-
-
-
 </template>
 
 <script setup>
@@ -106,7 +123,6 @@ import helper from '@/services/helper';
 import { useToast } from 'primevue/usetoast'
 import { storeToRefs } from 'pinia';
 
-
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 
@@ -115,10 +131,11 @@ const toast = useToast()
 const { fetchSchoolYearsAction } = useSchoolYearStore()
 const { getSchoolYears } = storeToRefs(useSchoolYearStore())
 
-const { fetchStudentResultTeacherAction, fetchStudentListAction } = useManageStudentStore()
-const { getStudentList, getStudentResultTeacher } = storeToRefs(useManageStudentStore())
+const { fetchStudentResultTeacherAction, fetchStudentListAction, fetchSubjectsAction, fetchExamsAction, updateStudentResult, deleteStudentResult } = useManageStudentStore()
+const { getStudentList, getStudentResultTeacher, getSubjects, getExams } = storeToRefs(useManageStudentStore())
 
 const input_result_visible = ref(false)
+const confirmDeleteVisible = ref(false)  // Ref for delete confirmation dialog visibility
 const academic_year = ref([])
 const student_list = ref([])
 const loading = ref(false)
@@ -126,6 +143,7 @@ const student_value = ref()
 const termValue = ref();
 const yearValue = ref()
 const resultTableValues = ref()
+const selectedResultId = ref(null)  // Ref to store the ID of the selected result
 
 const terms = ref([
     { name: 'First Term', code: 1 },
@@ -143,6 +161,8 @@ const tableColumns = [
 onBeforeMount(async () => {
     await fetchSchoolYearsAction()
     await fetchStudentListAction()
+    await fetchSubjectsAction()
+    await fetchExamsAction()
         .then(() => {
             academic_year.value = getSchoolYears.value.map((value) => ({
                 name: value.academic_year,
@@ -170,8 +190,9 @@ const handleGetResultsTeacher = async () => {
             resultTableValues.value = getStudentResultTeacher.value.map((value) => ({
                 subject: value.subject.subject_name,
                 marks: value.marks,
-                grade: value.score,
-                remark: value.remarks
+                grade: value.grade,
+                remark: value.remarks,
+                id: value.result_id
             }))
         })
         .catch(error => {
@@ -182,17 +203,54 @@ const handleGetResultsTeacher = async () => {
         })
 }
 
+// Confirm delete result
+const confirmDeleteResult = (id) => {
+    selectedResultId.value = id;  // Store the selected result ID
+    confirmDeleteVisible.value = true;  // Show the confirmation dialog
+}
+
+// Handle the deletion of the result
+const handleDeleteResult = () => {
+    deleteStudentResult(selectedResultId.value)
+        .then(() => {
+            confirmDeleteVisible.value = false;
+            // console.log('Result deleted:', res);
+            resultTableValues.value = resultTableValues.value.filter(result => result.id !== selectedResultId.value);
+            helper.showSuccess('Result deleted successfully', toast)
+        })
+        .catch((err) => {
+            console.log(err);
+            confirmDeleteVisible.value = false;
+            helper.showError('Error deleting result', toast)
+        });
+}
+
+// Edit Result Mark
 const editingRows = ref([]);
-const result_row = ref([])
 
 const onRowEditSave = (event) => {
     let { newData, index } = event;
-
-    result_row.value[index] = newData;
-
-    console.log(result_row);
-
+    const result = newData
+    const result_mark = {
+        marks: result.marks
+    }
+    console.log(result);
+    updateStudentResult(result.id, result_mark)
+        .then((res) => {
+            console.log(res);
+            resultTableValues.value[index] = newData;
+            helper.showSuccess('Result Updated successfully', toast)
+        })
+        .catch((err) => {
+            console.log(err);
+            helper.showError('Error updating result', toast)
+        })
 };
+
+const handleCreateResult = () => {
+    console.log("Delete function");
+
+}
 
 </script>
 
