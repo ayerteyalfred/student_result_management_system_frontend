@@ -1,49 +1,80 @@
 <template>
     <Dialog v-model:visible="confirmDeleteVisible" modal header="Confirm Deletion" :style="{ width: '30rem' }">
-        <div class="confirmation-content">
+        <div class="confirmation-content flex items-center gap-4">
             <span class="pi pi-exclamation-triangle" style="font-size: 2rem;"></span>
-            <span>Are you sure you want to delete this result?</span>
+            <span>Are you sure you want to delete this subject result ?</span>
         </div>
+
         <template #footer>
             <Button label="No" icon="pi pi-times" @click="confirmDeleteVisible = false" class="p-button-text" />
             <Button label="Yes" icon="pi pi-check" @click="handleDeleteResult" class="p-button-danger" />
         </template>
+
     </Dialog>
 
     <Dialog v-model:visible="input_result_visible" modal header="Input Results" :style="{ width: '44rem' }">
+
+        <div v-if="create_spinner"
+            class="absolute inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm z-10">
+            <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8"
+                class="fill-surface-0 dark:fill-surface-800" aria-label="loading" />
+        </div>
         <form @submit.prevent="handleCreateResult" class="flex flex-col gap-4">
             <div class="flex flex-col md:flex-row gap-4 w-full">
                 <InputGroup>
                     <InputGroupAddon>Student</InputGroupAddon>
-                    <Select :options="student_list" optionLabel="student_name" placeholder="Select Student" required
-                        class="w-full md:w-56" />
+                    <Select :options="student_list" optionLabel="student_name" placeholder="Select Student"
+                        v-model="createResultStudentValue" required class="w-full md:w-56" />
                 </InputGroup>
 
                 <InputGroup>
                     <InputGroupAddon>Exam</InputGroupAddon>
-                    <Select :options="getExams" optionLabel="name" placeholder="Select Exam" required
-                        class="w-full md:w-56" />
+                    <Select :options="getExams" optionLabel="name" placeholder="Select Exam"
+                        v-model="createResultExamValue" required class="w-full md:w-56" />
                 </InputGroup>
             </div>
             <div class="flex flex-col md:flex-row gap-4 w-full">
                 <InputGroup>
                     <InputGroupAddon>Subject</InputGroupAddon>
-                    <Select :options="getSubjects" optionLabel="subject_name" placeholder="Select Subject" required
-                        class="w-full md:w-56" />
+                    <Select :options="getSubjects" optionLabel="subject_name" placeholder="Select Subject"
+                        v-model="createResultSubjectValue" required class="w-full md:w-56" />
                 </InputGroup>
                 <InputGroup>
                     <InputGroupAddon>Mark</InputGroupAddon>
-                    <InputNumber inputId="minmax" prefix="%" :min="0" :max="100" fluid />
+                    <InputNumber inputId="minmax" prefix="%" :min="0" :max="100" required
+                        v-model="createResultMarkValue" fluid />
                 </InputGroup>
             </div>
+
+
+            <div class="flex flex-col md:flex-row gap-4 w-full">
+                <InputGroup>
+                    <InputGroupAddon>Academic Year</InputGroupAddon>
+                    <InputText :value="createResultExamValue?.school_year?.academic_year" disabled />
+                </InputGroup>
+                <InputGroup>
+                    <InputGroupAddon>Term</InputGroupAddon>
+                    <InputText :value="createResultExamValue?.term?.term_number" disabled />
+                </InputGroup>
+            </div>
+
+
             <div class="flex justify-end items-end">
                 <Button type="submit" label="Submit" />
             </div>
+
+            <!-- {{ getExams }} -->
+            {{ createResultExamValue }}
         </form>
     </Dialog>
 
 
+    <div class="card flex flex-col justify-center items-center">
+        <h2>Student Results</h2>
+        <img src="/img/teacher_icon.png" class="lg:w-[5%] w-[10%] rounded-full bg-slate-500" alt="">
+    </div>
     <div class="flex flex-col gap-4">
+
         <div class="flex justify-end items-end">
             <Button type="button" label="Input Result" @click="input_result_visible = true">
                 Input Result
@@ -51,7 +82,6 @@
             </Button>
         </div>
         <form @submit.prevent="handleGetResultsTeacher" class="card flex flex-col md:flex-row gap-4">
-
             <InputGroup>
                 <InputGroupAddon>
                     <i class="pi pi-user"></i>
@@ -111,6 +141,7 @@ import { ref, onBeforeMount } from 'vue'
 import { useManageStudentStore } from '@/stores/teacher_store/manage-students';
 import { useSchoolYearStore } from '@/stores/school_years';
 
+
 import ProgressSpinner from 'primevue/progressspinner'
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
@@ -131,7 +162,7 @@ const toast = useToast()
 const { fetchSchoolYearsAction } = useSchoolYearStore()
 const { getSchoolYears } = storeToRefs(useSchoolYearStore())
 
-const { fetchStudentResultTeacherAction, fetchStudentListAction, fetchSubjectsAction, fetchExamsAction, updateStudentResult, deleteStudentResult } = useManageStudentStore()
+const { fetchStudentResultTeacherAction, fetchStudentListAction, fetchSubjectsAction, fetchExamsAction, updateStudentResult, deleteStudentResult, inputStudentResult } = useManageStudentStore()
 const { getStudentList, getStudentResultTeacher, getSubjects, getExams } = storeToRefs(useManageStudentStore())
 
 const input_result_visible = ref(false)
@@ -139,6 +170,7 @@ const confirmDeleteVisible = ref(false)  // Ref for delete confirmation dialog v
 const academic_year = ref([])
 const student_list = ref([])
 const loading = ref(false)
+const create_spinner = ref(false)
 const student_value = ref()
 const termValue = ref();
 const yearValue = ref()
@@ -211,8 +243,10 @@ const confirmDeleteResult = (id) => {
 
 // Handle the deletion of the result
 const handleDeleteResult = () => {
+    loading.value = true
     deleteStudentResult(selectedResultId.value)
         .then(() => {
+            loading.value = false
             confirmDeleteVisible.value = false;
             // console.log('Result deleted:', res);
             resultTableValues.value = resultTableValues.value.filter(result => result.id !== selectedResultId.value);
@@ -220,6 +254,7 @@ const handleDeleteResult = () => {
         })
         .catch((err) => {
             console.log(err);
+            loading.value = false
             confirmDeleteVisible.value = false;
             helper.showError('Error deleting result', toast)
         });
@@ -235,23 +270,65 @@ const onRowEditSave = (event) => {
         marks: result.marks
     }
     console.log(result);
+    loading.value = true
     updateStudentResult(result.id, result_mark)
         .then((res) => {
             console.log(res);
+            loading.value = false
             resultTableValues.value[index] = newData;
             helper.showSuccess('Result Updated successfully', toast)
         })
         .catch((err) => {
+            loading.value = false
             console.log(err);
             helper.showError('Error updating result', toast)
         })
 };
 
-const handleCreateResult = () => {
-    console.log("Delete function");
 
+const createResultStudentValue = ref()
+const createResultExamValue = ref()
+const createResultSubjectValue = ref()
+const createResultMarkValue = ref()
+
+const handleCreateResult = () => {
+    if (createResultStudentValue.value == undefined || createResultExamValue.value == undefined || createResultSubjectValue.value == undefined || createResultMarkValue.value == undefined) {
+        return helper.showError('All fields are required to proceed', toast)
+    }
+    const data = {
+        student: createResultStudentValue.value?.student_id,
+        exam: createResultExamValue.value?.id,
+        subject: createResultSubjectValue.value?.id,
+        marks: createResultMarkValue?.value,
+    }
+
+    console.log(data);
+    create_spinner.value = true
+    inputStudentResult(data)
+        .then((res) => {
+            console.log(res);
+            create_spinner.value = false
+            createResultStudentValue.value = ref()
+            createResultExamValue.value = ref()
+            createResultSubjectValue.value = ref()
+            createResultMarkValue.value = ref()
+            helper.showSuccess(res.message, toast);
+        })
+        .catch((err) => {
+            console.log(err);
+            create_spinner.value = false
+            createResultStudentValue.value = ref()
+            createResultExamValue.value = ref()
+            createResultSubjectValue.value = ref()
+            createResultMarkValue.value = ref()
+            helper.showError(err.response.data.message, toast);
+        })
 }
 
 </script>
 
-<style scoped></style>
+<style scoped>
+input:disabled {
+    background-color: white;
+}
+</style>

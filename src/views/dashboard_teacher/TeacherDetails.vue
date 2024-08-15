@@ -42,7 +42,7 @@
 
         <div class="card flex flex-col justify-center items-center">
             <h2>Teacher Personal Details</h2>
-            <img src="/img/student_icon.png" class="lg:w-[5%] w-[10%] rounded-full bg-slate-500" alt="">
+            <img src="/img/teacher_icon.png" class="lg:w-[5%] w-[10%] rounded-full bg-slate-500" alt="">
         </div>
 
         <div v-if="loading" class="flex items-center justify-center bg-opacity-50 backdrop-blur-sm z-50">
