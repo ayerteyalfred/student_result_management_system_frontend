@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import LogIn from '@/views/auth/LoginPage.vue'
 
 // Teacher Dashboard Pages
-import OverviewPage from '@/views/dashboard_teacher/OverviewPage.vue'
+import OverviewTeacher from '@/views/dashboard_teacher/OverviewTeacher.vue'
 import TeacherClass from '@/views/dashboard_teacher/TeacherClass.vue'
 import ResultInput from '@/views/dashboard_teacher/ResultInput.vue'
 import TeacherDetails from '@/views/dashboard_teacher/TeacherDetails.vue'
@@ -12,6 +12,12 @@ import TeacherDetails from '@/views/dashboard_teacher/TeacherDetails.vue'
 // Student Dashboard Page
 import StudentDetails from '@/views/dashboard_student/StudentDetails.vue'
 import MyResult from '@/views/dashboard_student/MyResult.vue'
+
+// Staff Dashboard Page
+import OverviewStaff from '@/views/dashboard_staff/OverviewStaff.vue'
+import StaffDetails from '@/views/dashboard_staff/StaffDetails.vue'
+import CreateTeacher from '@/views/dashboard_staff/CreateTeacher.vue'
+import CreateStudent from '@/views/dashboard_staff/CreateStudent.vue'
 
 import crypto from '@/services/crypto'
 
@@ -23,6 +29,8 @@ if (user?.user_type == 'teacher') {
   default_redirect.value = 'overview-teacher'
 } else if (user?.user_type == 'student') {
   default_redirect.value = 'student-details'
+} else if (user?.user_type == 'staff') {
+  default_redirect.value = 'overview-staff'
 } else {
   default_redirect.value = 'login'
 }
@@ -49,7 +57,7 @@ const router = createRouter({
         {
           path: '/overview-teacher',
           name: 'overview-teacher',
-          component: OverviewPage,
+          component: OverviewTeacher,
           meta: {
             requiresAuth: true
           }
@@ -92,6 +100,43 @@ const router = createRouter({
           path: '/my-result',
           name: 'my-result',
           component: MyResult,
+          meta: {
+            requiresAuth: true
+          }
+        },
+
+        // Staff Dashboard Links
+        {
+          path: '/overview-staff',
+          name: 'overview-staff',
+          component: OverviewStaff,
+          meta: {
+            requiresAuth: true
+          }
+        },
+
+        {
+          path: '/create-teachers',
+          name: 'create-teachers',
+          component: CreateTeacher,
+          meta: {
+            requiresAuth: true
+          }
+        },
+
+        {
+          path: '/create-students',
+          name: 'create-students',
+          component: CreateStudent,
+          meta: {
+            requiresAuth: true
+          }
+        },
+
+        {
+          path: '/staff-details',
+          name: 'staff-details',
+          component: StaffDetails,
           meta: {
             requiresAuth: true
           }

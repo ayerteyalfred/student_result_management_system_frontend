@@ -28,6 +28,18 @@ const student_model = ref([
         ]
     }
 ]);
+
+const staff_model = ref([
+    {
+        label: 'Home',
+        items: [
+            { label: 'Overview', icon: 'pi pi-fw pi-home', to: '/overview-staff' },
+            { label: 'Teachers', icon: 'pi pi-fw pi-home', to: '/create-teachers' },
+            { label: 'Students', icon: 'pi pi-fw pi-home', to: '/create-students' },
+            { label: 'Personal Details', icon: 'pi pi-fw pi-home', to: '/staff-details' }
+        ]
+    }
+]);
 </script>
 
 <template>
@@ -40,6 +52,13 @@ const student_model = ref([
 
     <ul v-if="user.user_type == 'student'" class="layout-menu">
         <template v-for="(item, i) in student_model" :key="item">
+            <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
+            <li v-if="item.separator" class="menu-separator"></li>
+        </template>
+    </ul>
+
+    <ul v-if="user.user_type == 'staff'" class="layout-menu">
+        <template v-for="(item, i) in staff_model" :key="item">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
         </template>

@@ -72,6 +72,8 @@ const signIn = () => {
           router.push({ name: "overview-teacher" });
         } else if (res.user?.user_type == "student") {
           router.push({ name: "my-result" });
+        } else if (res.user?.user_type == "staff") {
+          router.push({ name: "overview-staff" });
         }
       }, 1000); // 2 seconds delay
     })
