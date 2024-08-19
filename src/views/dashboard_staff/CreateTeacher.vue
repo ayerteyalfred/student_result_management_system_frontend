@@ -1,4 +1,17 @@
 <template>
+    <Dialog v-model:visible="confirmDeleteVisible" modal header="Confirm Deletion" :style="{ width: '30rem' }">
+        <div class="confirmation-content flex items-center gap-4">
+            <span class="pi pi-exclamation-triangle" style="font-size: 2rem;"></span>
+            <span>Are you sure you want to delete {{ selectedTeacherId.surname }} {{ selectedTeacherId.given_name }}
+                ?</span>
+        </div>
+
+        <template #footer>
+            <Button label="No" icon="pi pi-times" @click="confirmDeleteVisible = false" class="p-button-text" />
+            <Button label="Yes" icon="pi pi-check" @click="handleDelete" class="p-button-danger" />
+        </template>
+
+    </Dialog>
     <div>
         <h1>Create Teacher</h1>
         <div class="flex justify-between items-center my-5">
@@ -16,12 +29,16 @@
             <Column field="phone_number" header="Phone Number" />
             <Column field="date_of_birth" header="Date of Birth" />
             <Column field="gender" header="Gender" />
-            <Column field="grade" header="Grade" />
+            <Column field="grade.name" header="Grade" />
             <Column header="Actions">
                 <template #body="slotProps">
-                    <Button icon="pi pi-pencil" class="p-button-rounded p-button-info p-mr-2"
-                        @click="openDialog(slotProps.data)" />
-                    <!-- Add more actions here if needed -->
+                    <div class="flex item-center">
+                        <Button icon="pi pi-pencil" class="p-button-rounded p-button-info p-mr-2"
+                            @click="openDialog(slotProps.data)" />
+                        <Button icon="pi pi-trash" outlined rounded severity="danger"
+                            class="p-button-rounded p-button-info mx-3" @click="confirmDelete(slotProps.data)" />
+                        <!-- Add more actions here if needed -->
+                    </div>
                 </template>
             </Column>
         </DataTable>
@@ -29,7 +46,7 @@
         <!-- Dialog for editing teacher -->
         <Dialog header="Edit Teacher" v-model:visible="showDialog" :modal="true" :closable="true"
             :style="{ width: '44rem' }">
-            <form @submit.prevent="saveTeacher" class="p-fluid flex flex-col gap-5">
+            <form @submit.prevent="saveEditTeacher" class="p-fluid flex flex-col gap-5">
                 <div class="flex flex-col md:flex-row gap-4 w-[49%]">
                     <InputGroup class="p-field">
                         <InputGroupAddon>Username</InputGroupAddon>
@@ -65,18 +82,19 @@
                     </InputGroup>
                     <InputGroup class="p-field">
                         <InputGroupAddon>Gender</InputGroupAddon>
-                        <InputText id="gender" v-model="selectedTeacher.gender" />
+                        <Select v-model="selectedTeacher.gender" :options="genderValue" optionLabel="name" />
                     </InputGroup>
                 </div>
                 <div class="flex flex-col md:flex-row gap-4 w-full">
                     <InputGroup class="p-field">
                         <InputGroupAddon>Phone Number</InputGroupAddon>
-                        <InputText id="phone_number" v-model="selectedTeacher.phone_number" />
+                        <InputMask v-model="selectedTeacher.phone_number" mask="999-999-9999" required
+                            placeholder="024-999-9990" />
                     </InputGroup>
                     <InputGroup class="p-field">
                         <InputGroupAddon>Grade</InputGroupAddon>
                         <Select v-model="selectedTeacher.grade" :options="getGrades" optionLabel="name" araia-required
-                            :placeholder="selectedTeacher.grade" class="w-full md:w-56" />
+                            class="w-full md:w-56" />
                         <!-- <InputText id="grade" v-model="selectedTeacher.grade" /> -->
                     </InputGroup>
                 </div>
@@ -90,6 +108,11 @@
         <!-- Dialog For Creating User -->
         <Dialog header="Create Teacher" v-model:visible="create_showDialog" :modal="true" :closable="true"
             :style="{ width: '44rem' }">
+            <div v-if="create_spinner"
+                class="absolute inset-0 flex items-center justify-center bg-opacity-50 backdrop-blur-sm z-10">
+                <ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8"
+                    class="fill-surface-0 dark:fill-surface-800" aria-label="loading" />
+            </div>
             <form @submit.prevent="handleCreateTeacher" class="p-fluid flex flex-col gap-5">
 
                 <div class="flex flex-col md:flex-row gap-4 w-full">
@@ -109,30 +132,31 @@
                     </InputGroup>
                     <InputGroup class="p-field">
                         <InputGroupAddon>Date of Birth</InputGroupAddon>
-                        <DatePicker v-model="create_date_of_birth" dateFormat="yy-mm-dd" inputId="birth_date"
-                            required />
+                        <DatePicker v-model="create_date_of_birth" dateFormat="yy-mm-dd" required />
                     </InputGroup>
                 </div>
                 <div class="flex flex-col md:flex-row gap-4 w-full">
                     <InputGroup class="p-field">
                         <InputGroupAddon>Gender</InputGroupAddon>
-                        <InputText id="gender" v-model="create_gender" required />
+                        <Select v-model="create_gender" :options="genderValue" optionLabel="name"
+                            placeholder="Select gender" />
                     </InputGroup>
                     <InputGroup class="p-field">
                         <InputGroupAddon>Phone Number</InputGroupAddon>
-                        <InputText id="phone_number" v-model="create_phone_number" />
+                        <InputMask id="basic" v-model="create_phone_number" mask="999-999-9999" required
+                            placeholder="024-999-9990" />
                     </InputGroup>
                 </div>
                 <div class="flex flex-col md:flex-row gap-4 w-full">
                     <InputGroup class="p-field">
                         <InputGroupAddon>Grade</InputGroupAddon>
-                        <Select v-model="create_grade" :options="getGrades" optionLabel="name" araia-required
-                            class="w-full md:w-56" required />
+                        <Select v-model="create_grade" :options="getGrades" optionLabel="name" class="w-full md:w-56" />
                     </InputGroup>
                 </div>
                 <div class="flex justify-end items-center gap-5">
                     <Button type="submit" label="Save" icon="pi pi-check" />
-                    <Button label="Cancel" icon="pi pi-times" class="p-button-secondary" @click="showDialog = false" />
+                    <Button label="Cancel" icon="pi pi-times" class="p-button-secondary"
+                        @click="create_showDialog = false" />
                 </div>
             </form>
         </Dialog>
@@ -156,19 +180,32 @@ import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
 import DatePicker from 'primevue/datepicker';
 import Select from 'primevue/select';
+import InputMask from 'primevue/inputmask';
 import { useToast } from 'primevue/usetoast'
 import helper from '@/services/helper';
 
 const toast = useToast()
-const { fetchTeachersAction, updateTeacherInfo, createTeacher } = useGetTeachersStore();
+const { fetchTeachersAction, updateTeacherInfo, createTeacher, deleteTeacher } = useGetTeachersStore();
 const { fetchGradeAction } = useGetGradeStore()
 const { getGrades } = storeToRefs(useGetGradeStore())
 const { getTeachers } = storeToRefs(useGetTeachersStore());
 const searchTerm = ref('');
+const confirmDeleteVisible = ref(false)  // Ref for delete confirmation dialog visibility
 const isLoading = ref(false);
+const create_spinner = ref(false)
 const showDialog = ref(false);
 const selectedTeacher = ref(null);
 const create_showDialog = ref()
+const selectedTeacherId = ref(null)
+
+const genderValue = ref([
+    {
+        name: "Male"
+    },
+    {
+        name: "Female"
+    }
+])
 
 onBeforeMount(async () => {
     isLoading.value = true
@@ -187,6 +224,11 @@ onBeforeMount(async () => {
 const filteredTeachers = computed(() => {
     const term = searchTerm.value.toLowerCase();
     return getTeachers.value.filter(teacher => {
+        getGrades.value.forEach((jjk) => {
+            if (jjk.id == teacher.grade) {
+                teacher.grade = jjk
+            }
+        })
         return (
             teacher?.user?.username?.toLowerCase().includes(term) ||
             teacher?.given_name?.toLowerCase().includes(term) ||
@@ -206,7 +248,32 @@ const create_gender = ref()
 const create_grade = ref()
 const create_phone_number = ref()
 
+
+const resetForm = () => {
+    create_given_name.value = '';
+    create_surname.value = '';
+    create_middle_name.value = '';
+    create_date_of_birth.value = '';
+    create_gender.value = null;
+    create_grade.value = null;
+    create_phone_number.value = '';
+}
+
 const handleCreateTeacher = () => {
+
+    if (!create_date_of_birth.value || !create_phone_number.value || !create_gender.value || !create_grade.value) {
+        return helper.showError(`All Fields Are Required Except Middle Name`, toast)
+    }
+
+    // Convert Created Date  
+    let formattedDateOfBirth = '';
+    if (create_date_of_birth.value) {
+        const parsedDate = new Date(create_date_of_birth.value);
+        if (!isNaN(parsedDate)) {
+            formattedDateOfBirth = parsedDate.toISOString().slice(0, 10);
+        }
+    }
+
     const createTeacherData = {
         user: {
             username: create_surname.value.toLowerCase() + create_given_name.value.toLowerCase(),
@@ -218,33 +285,47 @@ const handleCreateTeacher = () => {
         },
         given_name: create_given_name.value,
         surname: create_surname.value,
-        gender: create_gender.value,
+        gender: create_gender.value?.name,
         email_address: create_surname.value.toLowerCase() + create_given_name.value.toLowerCase() + '@deks.com',
         phone_number: create_phone_number.value,
+        middle_name: create_middle_name.value,
+        date_of_birth: formattedDateOfBirth,
         grade: create_grade?.value?.id
     }
 
-    console.log(createTeacherData);
+    // console.log(createTeacherData);
 
+    create_spinner.value = true
     createTeacher(createTeacherData)
         .then(() => {
-            showDialog.value = false
+            create_spinner.value = false
+            create_showDialog.value = false
             helper.showSuccess('Teacher Created successfully', toast)
+            resetForm()
         }).catch((err) => {
+            create_spinner.value = false
             helper.showError('Error Creating teacher', toast)
             console.log("Error Creating teacher:", err);
         })
-
 }
 
 
 
 const openDialog = (teacher) => {
     selectedTeacher.value = { ...teacher }; // Create a copy of the teacher data
+
     showDialog.value = true;
+    genderValue.value.forEach((gender) => {
+        if (gender.name == selectedTeacher.value?.gender) {
+            selectedTeacher.value.gender = gender
+        }
+    })
+    console.log(selectedTeacher.value);
+
 };
 
-const saveTeacher = () => {
+const saveEditTeacher = () => {
+    // Convert Update Date  
     let formattedDateOfBirth = '';
     if (selectedTeacher.value.date_of_birth) {
         const parsedDate = new Date(selectedTeacher.value.date_of_birth);
@@ -263,13 +344,14 @@ const saveTeacher = () => {
         given_name: selectedTeacher.value.given_name,
         middle_name: selectedTeacher.value.middle_name,
         date_of_birth: formattedDateOfBirth,
-        gender: selectedTeacher.value.gender,
+        gender: selectedTeacher.value.gender?.name,
+        phone_number: selectedTeacher.value?.phone_number,
         grade: selectedTeacher.value.grade?.id
     }
 
     const teacher_id = selectedTeacher.value.id
 
-    // console.log(teacher_id, teacher_data);
+    console.log(teacher_id, teacher_data);
 
 
     updateTeacherInfo(teacher_id, teacher_data)
@@ -281,6 +363,30 @@ const saveTeacher = () => {
             console.log("Error updating teacher:", err);
         })
 }
+
+const confirmDelete = (teacher) => {
+    confirmDeleteVisible.value = true;  // Show the confirmation dialog
+    selectedTeacherId.value = teacher
+
+    console.log(teacher);
+
+
+};
+
+// Function to handle deletion of the teacher
+const handleDelete = () => {
+    deleteTeacher(selectedTeacherId.value?.user?.id, selectedTeacherId.value?.id)
+        .then(() => {
+            confirmDeleteVisible.value = false;
+            // console.log('Result deleted:', res);
+            helper.showSuccess('Teacher deleted successfully', toast)
+        })
+        .catch((err) => {
+            console.log(err);
+            confirmDeleteVisible.value = false;
+            helper.showError('Error deleting teacher', toast)
+        });
+};
 </script>
 
 <style scoped></style>

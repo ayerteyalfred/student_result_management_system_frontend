@@ -1,24 +1,24 @@
 import { defineStore } from 'pinia'
 import resource from '@/services/resources'
 
-export const useGetTeachersStore = defineStore('get_teachers', {
+export const useGetStudentsStore = defineStore('get_students', {
   state: () => ({
-    gets_teachers: []
+    gets_students: []
   }),
 
   getters: {
-    getTeachers(state) {
-      return state.gets_teachers
+    getStudents(state) {
+      return state.gets_students
     }
   },
 
   actions: {
-    fetchTeachersAction() {
+    fetchStudentsAction() {
       return new Promise((resolve, reject) => {
-        new resource(`teachers`)
+        new resource(`students`)
           .newget()
           .then((res) => {
-            this.gets_teachers = res.data.data
+            this.gets_students = res.data.data
             console.log(res.data)
 
             resolve(res)
@@ -29,13 +29,13 @@ export const useGetTeachersStore = defineStore('get_teachers', {
       })
     },
 
-    createTeacher(teacher) {
+    createStudents(student) {
       return new Promise((resolve, reject) => {
-        new resource('teachers/')
-          .store(teacher)
+        new resource('students/')
+          .store(student)
           .then((res) => {
             // console.log(res.data.data)
-            this.gets_teachers = [res.data.data, ...this.gets_teachers]
+            this.gets_students = [res.data.data, ...this.gets_students]
             resolve(res.data)
           })
           .catch((err) => {
@@ -44,20 +44,20 @@ export const useGetTeachersStore = defineStore('get_teachers', {
       })
     },
 
-    updateTeacherInfo(teacher_id, teacher_details) {
+    updateStudentsInfo(student_id, student_details) {
       return new Promise((resolve, reject) => {
-        new resource('teachers')
-          .update(teacher_details, teacher_id)
+        new resource('students')
+          .update(student_details, student_id)
           .then((res) => {
-            const updatedTeacher = res.data.data
-            this.gets_teachers = this.gets_teachers.map((teacher) => {
-              if (teacher.id == updatedTeacher.id) {
-                return updatedTeacher // Replace the old teacher object with the updated one
+            const updatedStudent = res.data.data
+            this.gets_students = this.gets_students.map((student) => {
+              if (student.id == updatedStudent.id) {
+                return updatedStudent // Replace the old student object with the updated one
               }
-              return teacher // Return the original teacher object if not matching
+              return student // Return the original Student object if not matching
             })
 
-            console.log(this.gets_teachers)
+            console.log(this.gets_students)
 
             resolve(res.data)
           })
@@ -67,12 +67,12 @@ export const useGetTeachersStore = defineStore('get_teachers', {
       })
     },
 
-    deleteTeacher(id, teacher_id) {
+    deleteStudents(id, student_id) {
       return new Promise((resolve, reject) => {
         new resource('users')
           .destroy(id)
           .then((res) => {
-            this.gets_teachers = this.gets_teachers.filter((teacher) => teacher.id !== teacher_id)
+            this.gets_students = this.gets_students.filter((student) => student.id !== student_id)
             resolve(res.data)
           })
           .catch((err) => {
