@@ -6,6 +6,8 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import VueSweetalert2 from 'vue-sweetalert2'
+import 'sweetalert2/dist/sweetalert2.min.css'
 import PrimeVue from 'primevue/config'
 import { definePreset } from '@primevue/themes'
 import Aura from '@primevue/themes/aura'
@@ -50,7 +52,7 @@ app.use(PrimeVue, {
 })
 app.use(ToastService)
 app.use(ConfirmationService)
-
+app.use(VueSweetalert2)
 app.use(createPinia())
 app.use(router)
 

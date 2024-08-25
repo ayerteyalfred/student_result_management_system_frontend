@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', {
     token: '',
     student_id: '',
     teacher_id: '',
+    staff_id: '',
     router: useRouter()
   }),
 
@@ -39,6 +40,14 @@ export const useAuthStore = defineStore('auth', {
         ? crypto.decryptData(encryptedTeacher, crypto.secretKey())
         : ''
       return decryptTeacher
+    },
+
+    getStaffId() {
+      const encryptedStaff = localStorage.getItem('staff_id')
+      const decryptStaff = encryptedStaff
+        ? crypto.decryptData(encryptedStaff, crypto.secretKey())
+        : ''
+      return decryptStaff
     }
   },
 
@@ -60,14 +69,21 @@ export const useAuthStore = defineStore('auth', {
               crypto.secretKey()
             )
             localStorage.setItem('student_id', encryptedStudent_id)
-            this.student_id = res.data.student_id
+            this.student_id = res.data?.student_id
 
             const encryptedTeacher_id = crypto.encryptData(
-              JSON.stringify(res.data.teacher_id),
+              JSON.stringify(res.data?.teacher_id),
               crypto.secretKey()
             )
             localStorage.setItem('teacher_id', encryptedTeacher_id)
-            this.teacher_id = res.data.teacher_id
+            this.teacher_id = res.data?.teacher_id
+
+            const encryptedStaff_id = crypto.encryptData(
+              JSON.stringify(res.data?.staff_id),
+              crypto.secretKey()
+            )
+            localStorage.setItem('staff_id', encryptedStaff_id)
+            this.teacher_id = res.data?.staff_id
 
             const encryptedToken = crypto.encryptData(res.data.token, crypto.secretKey())
             localStorage.setItem('Token', encryptedToken)

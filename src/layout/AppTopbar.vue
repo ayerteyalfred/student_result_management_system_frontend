@@ -48,8 +48,8 @@ const handleSignout = () => {
                 <span class="font-bold text-2xl block mb-2 mt-6">{{ message.header }}</span>
                 <p class="mb-0">{{ message.message }}</p>
                 <div class="flex items-center gap-2 mt-6">
-                    <Button label="Yes" @click="acceptCallback"></Button>
-                    <Button label="Cancel" outlined @click="rejectCallback"></Button>
+                    <Button label="Yes" @click="acceptCallback" class="w-48"></Button>
+                    <Button label="Cancel" outlined @click="rejectCallback" class="w-48"></Button>
                 </div>
             </div>
         </template>
@@ -70,7 +70,7 @@ const handleSignout = () => {
         <div class="layout-topbar-actions">
             <div class="layout-config-menu justify-center items-center">
                 <aside class="font-medium text-lg">
-                    {{ user.first_name }} {{ user.last_name }}
+                    {{ user.last_name }} {{ user.first_name }}
                 </aside>
             </div>
             <div v-if="user.user_type == 'student'" class="layout-config-menu">

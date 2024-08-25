@@ -64,7 +64,7 @@
             </div>
 
             <!-- {{ getExams }} -->
-            {{ createResultExamValue }}
+            <!-- {{ createResultExamValue }} -->
         </form>
     </Dialog>
 
@@ -117,12 +117,8 @@
 
         <div class="card">
             <DataTable v-model:editingRows="editingRows" editMode="row" :value="resultTableValues"
-                tableStyle="min-width: 50rem" size="large" @row-edit-save="onRowEditSave">
+                tableStyle="min-width: 50rem" size="large" @row-edit-save="onRowEditSave" stripedRows>
                 <Column v-for="col of tableColumns" :key="col.field" :field="col.field" :header="col.header">
-                    <template #editor="{ data, field }">
-                        <InputNumber v-if="field == 'marks'" v-model="data[field]" suffix="%" :min="0" :max="100" />
-                        <InputText v-else v-model="data[field]" disabled />
-                    </template>
                 </Column>
                 <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
                 <Column :exportable="false" style="width: 10%; min-width: 12rem">
@@ -133,6 +129,21 @@
                 </Column>
             </DataTable>
         </div>
+
+        <div class="reportLayout hidden" id="modal-content">
+            <ResultsPDF :resultTableValues="resultTableValues" :yearValue="yearValue?.name || 'N/A'"
+                :termValue="termValue?.name || 'N/A'" :student_value="student_value?.student_name || 'N/A'"
+                :exam="getStudentResultTeacher[0]?.exam"
+                :teacherName="`${getTeacherDetails?.surname} ${getTeacherDetails?.given_name}`"
+                :classGrade="getTeacherDetails.grade?.name" />
+        </div>
+
+        <div v-if="resultTableValues" class="flex justify-end items-start">
+            <Button label="print" @click="myPDF">
+                Print Result
+                <i class="pi pi-download"></i>
+            </Button>
+        </div>
     </div>
 </template>
 
@@ -140,8 +151,10 @@
 import { ref, onBeforeMount } from 'vue'
 import { useManageStudentStore } from '@/stores/teacher_store/manage-students';
 import { useSchoolYearStore } from '@/stores/school_years';
+import { useTeacherDetailsStore } from '@/stores/teacher_store/teacher_details';
+import { useGetGradeStore } from '@/stores/grades';
 
-
+import printJS from 'print-js'
 import ProgressSpinner from 'primevue/progressspinner'
 import InputGroup from 'primevue/inputgroup';
 import InputGroupAddon from 'primevue/inputgroupaddon';
@@ -156,6 +169,7 @@ import { storeToRefs } from 'pinia';
 
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import ResultsPDF from '@/components/ResultsPDF.vue'
 
 const toast = useToast()
 
@@ -164,6 +178,11 @@ const { getSchoolYears } = storeToRefs(useSchoolYearStore())
 
 const { fetchStudentResultTeacherAction, fetchStudentListAction, fetchSubjectsAction, fetchExamsAction, updateStudentResult, deleteStudentResult, inputStudentResult } = useManageStudentStore()
 const { getStudentList, getStudentResultTeacher, getSubjects, getExams } = storeToRefs(useManageStudentStore())
+
+const { fetchTeacherDetailsAction } = useTeacherDetailsStore()
+const { getTeacherDetails } = storeToRefs(useTeacherDetailsStore())
+const { fetchGradeAction } = useGetGradeStore()
+const { getGrades } = storeToRefs(useGetGradeStore())
 
 const input_result_visible = ref(false)
 const confirmDeleteVisible = ref(false)  // Ref for delete confirmation dialog visibility
@@ -195,6 +214,8 @@ onBeforeMount(async () => {
     await fetchStudentListAction()
     await fetchSubjectsAction()
     await fetchExamsAction()
+    await fetchTeacherDetailsAction()
+    await fetchGradeAction()
         .then(() => {
             academic_year.value = getSchoolYears.value.map((value) => ({
                 name: value.academic_year,
@@ -204,6 +225,13 @@ onBeforeMount(async () => {
                 student_id: value.id,
                 student_name: `${value.given_name} ${value.surname}`
             }))
+            if (getTeacherDetails.value) {
+                getGrades.value.forEach((jjk) => {
+                    if (jjk.id == getTeacherDetails.value.grade) {
+                        getTeacherDetails.value.grade = jjk
+                    }
+                });
+            }
         })
         .catch(error => {
             console.log("Error fetching:", error);
@@ -215,6 +243,7 @@ const handleGetResultsTeacher = async () => {
     if (yearValue.value == undefined || termValue.value == undefined || student_value.value == undefined) {
         return helper.showError('Select student, academic year and term to proceed', toast)
     }
+
     loading.value = true
     await fetchStudentResultTeacherAction(`${student_value.value.student_id}/results/${yearValue.value?.code}/${termValue.value?.code}`)
         .then(() => {
@@ -224,7 +253,8 @@ const handleGetResultsTeacher = async () => {
                 marks: value.marks,
                 grade: value.grade,
                 remark: value.remarks,
-                id: value.result_id
+                id: value.result_id,
+                exam: value.exam
             }))
         })
         .catch(error => {
@@ -325,10 +355,98 @@ const handleCreateResult = () => {
         })
 }
 
+const myPDF = () => {
+    printJS({
+        printable: 'modal-content',
+        type: 'html',
+        style: `
+            /* General Layout */
+            .reportLayout {
+                padding: 30px;
+                background-color: #ffffff;
+                border-radius: 12px;
+                font-family: Arial, sans-serif;
+                color: #333;
+            }
+            
+            /* Header Section */
+            .report-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .report-header h1 {
+                font-size: 40px;
+                margin: 0;
+                color: #4a90e2;
+            }
+            .report-header p {
+                font-size: 1.2rem;
+                margin: 5px 0 0;
+                color: #777;
+            }
+
+            /* Information Section */
+            .report-info {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                margin-bottom: 30px;
+                font-size: 1.1rem;
+                line-height: 1.6;
+            }
+            .report-info strong {
+                color: #4a90e2;
+            }
+
+            /* Table Section */
+            .report-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 30px;
+                font-size: 1rem;
+            }
+            .report-table th,
+            .report-table td {
+                border: 1px solid #ddd;
+                padding: 12px;
+                text-align: left;
+            }
+            .report-table th {
+                background-color: #f5f5f5;
+                font-weight: bold;
+                color: #333;
+            }
+            .report-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            .report-table tr:hover {
+                background-color: #f1f1f1;
+            }
+
+            /* Footer Section */
+            .report-footer {
+                text-align: center;
+                margin-top: 30px;
+                font-size: 0.9rem;
+                color: #777;
+            }
+            .report-footer p {
+                margin: 0;
+            }
+        `,
+        targetStyle: ['*'],
+    })
+}
+
 </script>
 
 <style scoped>
 input:disabled {
     background-color: white;
+}
+
+.reportLayout {
+    margin-left: 2cm;
+    margin-right: 2cm;
 }
 </style>

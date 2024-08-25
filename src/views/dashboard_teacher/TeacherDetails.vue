@@ -103,7 +103,7 @@
 
                     <InputGroup>
                         <InputGroupAddon>Grade</InputGroupAddon>
-                        <InputText :value="getTeacherDetails?.grade" disabled />
+                        <InputText :value="getTeacherDetails?.grade?.name" disabled />
                     </InputGroup>
                 </div>
             </div>
@@ -111,8 +111,6 @@
         <div v-else-if="pageNotFound" class="flex items-center justify-center">
             <img src="/img/not-found.png" alt="">
         </div>
-
-
     </div>
 
 </template>
@@ -121,6 +119,7 @@
 import { onBeforeMount, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useTeacherDetailsStore } from '@/stores/teacher_store/teacher_details';
+import { useGetGradeStore } from '@/stores/grades';
 import ProgressSpinner from 'primevue/progressspinner'
 import DatePicker from 'primevue/datepicker';
 import InputText from 'primevue/inputtext';
@@ -134,6 +133,8 @@ import { useToast } from 'primevue/usetoast'
 
 const { getTeacherDetails } = storeToRefs(useTeacherDetailsStore())
 const { fetchTeacherDetailsAction, updateTeacher } = useTeacherDetailsStore()
+const { fetchGradeAction } = useGetGradeStore()
+const { getGrades } = storeToRefs(useGetGradeStore())
 
 const toast = useToast()
 const loading = ref(false)
@@ -151,6 +152,7 @@ const user_type = "student"
 onBeforeMount(async () => {
     loading.value = true
     await fetchTeacherDetailsAction()
+    await fetchGradeAction()
         .then(() => {
             // Set the form fields after fetching data
             if (getTeacherDetails.value) {
@@ -159,6 +161,11 @@ onBeforeMount(async () => {
                 middle_name.value = getTeacherDetails.value.middle_name || ''
                 date_of_birth.value = getTeacherDetails.value.date_of_birth || ''
                 gender.value = getTeacherDetails.value.gender || ''
+                getGrades.value.forEach((jjk) => {
+                    if (jjk.id == getTeacherDetails.value.grade) {
+                        getTeacherDetails.value.grade = jjk
+                    }
+                });
             }
             loading.value = false
         })

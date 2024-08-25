@@ -1,7 +1,9 @@
 import TeachesLayout from '@/layout/TeachesLayout.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { ref } from 'vue'
+import Swal from 'sweetalert2'
 import LogIn from '@/views/auth/LoginPage.vue'
+import PageNotFound from '@/views/PageNotFound.vue'
 
 // Teacher Dashboard Pages
 import OverviewTeacher from '@/views/dashboard_teacher/OverviewTeacher.vue'
@@ -60,6 +62,27 @@ const router = createRouter({
           component: OverviewTeacher,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'student') {
+              next('/student-details')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'staff') {
+              next('/overview-staff')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         },
         {
@@ -68,6 +91,27 @@ const router = createRouter({
           component: TeacherClass,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'student') {
+              next('/student-details')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'staff') {
+              next('/overview-staff')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         },
         {
@@ -76,6 +120,27 @@ const router = createRouter({
           component: ResultInput,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'student') {
+              next('/student-details')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'staff') {
+              next('/overview-staff')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         },
         {
@@ -84,6 +149,27 @@ const router = createRouter({
           component: TeacherDetails,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'student') {
+              next('/student-details')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'staff') {
+              next('/overview-staff')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         },
 
@@ -94,6 +180,27 @@ const router = createRouter({
           component: StudentDetails,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'teacher') {
+              next('/overview-teacher')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'staff') {
+              next('/overview-staff')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         },
         {
@@ -102,6 +209,27 @@ const router = createRouter({
           component: MyResult,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'teacher') {
+              next('/overview-teacher')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'staff') {
+              next('/overview-staff')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         },
 
@@ -112,6 +240,27 @@ const router = createRouter({
           component: OverviewStaff,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'teacher') {
+              next('/overview-teacher')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'student') {
+              next('/student-details')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         },
 
@@ -121,6 +270,27 @@ const router = createRouter({
           component: CreateTeacher,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'teacher') {
+              next('/overview-teacher')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'student') {
+              next('/student-details')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         },
 
@@ -130,6 +300,27 @@ const router = createRouter({
           component: CreateStudent,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'teacher') {
+              next('/overview-teacher')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'student') {
+              next('/student-details')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         },
 
@@ -139,10 +330,32 @@ const router = createRouter({
           component: StaffDetails,
           meta: {
             requiresAuth: true
+          },
+          beforeEnter: (to, from, next) => {
+            if (user?.user_type == 'teacher') {
+              next('/overview-teacher')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else if (user?.user_type == 'student') {
+              next('/student-details')
+              Swal.fire(
+                'Unauthourized Access!',
+                `Please you have not been authourized to have access to this page.
+                          Kindly contact your administrator.`,
+                'warning'
+              )
+            } else {
+              next()
+            }
           }
         }
       ]
-    }
+    },
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: PageNotFound }
   ]
 })
 
