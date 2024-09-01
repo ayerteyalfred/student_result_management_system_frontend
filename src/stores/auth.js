@@ -115,40 +115,5 @@ export const useAuthStore = defineStore('auth', {
           })
       })
     }
-
-    // refreshToken() {
-    //   return new Promise((resolve, reject) => {
-    //     new resource('refresh')
-    //       .list()
-    //       .then((res) => {
-    //         // Update the token with the refreshed token
-    //         const encryptedToken = crypto.encryptData(res.data.access_token, crypto.secretKey())
-    //         localStorage.setItem('Token', encryptedToken)
-    //         this.token = encryptedToken
-    //         // Restart session timer
-    //         // console.log("Restarted");
-    //         this.startSessionTimer()
-    //         resolve()
-    //       })
-    //       .catch((error) => {
-    //         helper
-    //           .sessionExpiredPrompt('Session Expired', {
-    //             allowOutsideClick: false // Disable closing on outside click
-    //           })
-    //           .then((result) => {
-    //             if (result.isConfirmed) {
-    //               localStorage.removeItem('userInfo')
-    //               localStorage.removeItem('Token')
-    //               localStorage.removeItem('Permissions')
-    //               this.router.push({ name: 'login' }).then(() => {
-    //                 this.router.go()
-    //               })
-    //             }
-    //           })
-    //         console.error('Failed to refresh token:', error)
-    //         reject()
-    //       })
-    //   })
-    // }
   }
 })

@@ -258,9 +258,9 @@ const handleGetResultsTeacher = async () => {
             }))
         })
         .catch(error => {
+            loading.value = false
             resultTableValues.value = []
             console.log("Error fetching", error);
-            loading.value = false
             helper.showError('Results Not Found', toast)
         })
 }

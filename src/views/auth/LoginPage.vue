@@ -78,6 +78,15 @@ const signIn = () => {
       }, 1000); // 2 seconds delay
     })
     .catch((err) => {
+      if (err.response.status == 401) {
+        localStorage.removeItem('userInfo')
+        localStorage.removeItem('Token')
+        localStorage.removeItem('student_id')
+        localStorage.removeItem('teacher_id')
+        localStorage.removeItem('staff_id')
+      }
+      console.log(err.response.status);
+
       loading.value = false;
       helper.showError(err.response.data.message, toast);
       email.value = "";
