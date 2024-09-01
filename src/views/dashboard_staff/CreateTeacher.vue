@@ -215,6 +215,14 @@ onBeforeMount(async () => {
             isLoading.value = false
         })
         .catch((err) => {
+            if (err.response.status == 401) {
+                localStorage.removeItem('userInfo')
+                localStorage.removeItem('Token')
+                localStorage.removeItem('student_id')
+                localStorage.removeItem('teacher_id')
+                localStorage.removeItem('staff_id')
+                window.location.href = "/login";
+            }
             isLoading.value = false
             helper.showError('Error getting data, Please check your network', toast)
             console.log("Error fetching:", err);

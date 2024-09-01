@@ -19,7 +19,7 @@
         <form @submit.prevent="signIn" action="" class="flex flex-col gap-y-6 w-full">
           <InputText id="email" v-model="email" size="large" type="email" placeholder="Email" required
             :invalid="invalid" />
-          <Password v-model="password" toggleMask placeholder="Password" size="large" fluid required
+          <Password v-model="password" toggleMask placeholder="Password" size="large" fluid required :feedback="false"
             :invalid="invalid" />
           <Button type="submit" label="Submit" />
         </form>

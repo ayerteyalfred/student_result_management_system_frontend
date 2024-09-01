@@ -104,6 +104,14 @@ onBeforeMount(async () => {
             }))
         })
         .catch(error => {
+            if (error.response.status == 401) {
+                localStorage.removeItem('userInfo')
+                localStorage.removeItem('Token')
+                localStorage.removeItem('student_id')
+                localStorage.removeItem('teacher_id')
+                localStorage.removeItem('staff_id')
+                window.location.href = "/login";
+            }
             console.log("Error fetching:", error);
         });
 })

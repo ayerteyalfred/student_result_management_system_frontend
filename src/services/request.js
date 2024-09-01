@@ -1,8 +1,8 @@
 import axios from 'axios'
 import crypto from '@/services/crypto'
 
-// const baseURL = 'https://student-result-management-system-backend.onrender.com/api/'
-const baseURL = 'http://127.0.0.1:8000/api/'
+const baseURL = 'https://student-result-management-system-backend.onrender.com/api/'
+// const baseURL = 'http://127.0.0.1:8000/api/'
 
 // Create axios instance
 const service = axios.create({
