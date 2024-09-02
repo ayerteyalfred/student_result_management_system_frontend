@@ -1,34 +1,21 @@
 <template>
-  <Swiper
-    :space-between="20"
-    :loop="true"
-    :pagination="{ clickable: true }"
-    :navigation="true"
-    :lazyloading="true"
+  <Swiper :space-between="20" :loop="true" :pagination="{ clickable: true }" :navigation="true" :lazyloading="true"
     :autoplay="{
       delay: 5000,
       disableOnInteraction: false,
       pauseOnMouseEnter: true
-    }"
-    :modules="modules"
-    class="mySlider cursor-grab"
-  >
+    }" :modules="modules" class="mySlider cursor-grab">
     <template v-for="slide in slideStory" :key="slide.key">
       <Swiper-slide class="swiper-slide relative">
-        <img
-          :src="slide.image"
-          alt="Slide Image"
-          class="w-[400px] h-full hidden rounded-r-2xl md:block object-cover"
-        />
+        <img :src="slide.image" alt="Slide Image" class="w-[400px] h-full hidden rounded-r-2xl md:block object-cover" />
         <div
-          class="absolute hidden bottom-10 right-6 p-6 bg-white bg-opacity-30 backdrop-blur-sm rounded drop-shadow-lg md:block"
-        >
+          class="absolute hidden bottom-10 right-6 p-6 bg-white bg-opacity-30 backdrop-blur-sm rounded drop-shadow-lg md:block">
           <span class="text-white text-xl">
-            We've been using Untitle to kick
+            Welcome to DEKS School Result
             <br />
-            start every new project and can't
+            Management System - Your
             <br />
-            imagine working without it.
+            Gateway to Academic Excellence.
           </span>
         </div>
       </Swiper-slide>
